@@ -1,0 +1,550 @@
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2c3e50;
+  --background-color: #121212;
+  --surface-color: #28282b;
+  --text-color: #f9f9f9;
+  --text-color-secondary: #6f6f6f;
+  --border-color: #383838;
+  --error-color: #e74c3c;
+  --error-color-hover: #c0392b;
+}
+
+/* Base Styles */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Layout */
+#map {
+  height: 65vh;
+  width: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+#control-panel-container {
+  height: 35vh;
+  padding: 0 5px;
+  background-color: var(--background-color);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+#control-list-container {
+  height: 100%;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+#control-list {
+  list-style-type: none;
+  padding: 0;
+  padding-bottom: 50px; /* Allows to scroll past last item to get it above blue button */
+}
+
+/* Clue Styles */
+.clue-container {
+  background-color: var(--surface-color);
+  border-radius: 8px;
+  padding: 1px;
+  margin: 6px 6px 2px;
+  transition: all 0.3s ease;
+}
+
+.clue-header,
+.clue-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.clue-text {
+  font-weight: bold;
+  font-size: 1em;
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.clue-notes {
+  font-style: italic;
+  font-size: 0.9em;
+  color: var(--text-color-secondary);
+  margin-top: 5px;
+  opacity: 0.8;
+}
+
+.clue-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-left: 10px;
+}
+
+.clue-timestamp {
+  font-size: 0.8em;
+  color: var(--text-color-secondary);
+  margin-bottom: 4px;
+}
+
+.clue-giver {
+  font-size: 0.8em;
+  padding: 2px 6px;
+  border-radius: 12px;
+  color: var(--text-color);
+}
+
+.clue-controls {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Control Styles */
+.control {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 25px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9em;
+}
+
+.control input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 18px;
+  width: 18px;
+  background-color: var(--background-color);
+  border: 1px solid var(--text-color-secondary);
+  border-radius: 3px;
+}
+
+.control:hover input ~ .checkmark {
+  background-color: var(--surface-color);
+}
+
+.control input:checked ~ .checkmark {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.checkmark:after {
+  content: '';
+  position: absolute;
+  display: none;
+}
+
+.control input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.control .checkmark:after {
+  left: 6px;
+  top: 2px;
+  width: 4px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Button Styles */
+button {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: var(--primary-color);
+}
+
+.clue-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.visibility-toggle,
+.delete-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 1.2em;
+  color: var(--text-color);
+  transition: color 0.3s ease;
+}
+
+.visibility-toggle:hover {
+  background-color: transparent;
+}
+
+.visibility-toggle.hidden {
+  color: var(--text-color-secondary);
+}
+
+.clue-container {
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.clue-container.hidden {
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+
+.clue-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.clue-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 10px;
+}
+
+.invert-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 1.2em;
+  color: var(--text-color);
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.invert-toggle:hover {
+  background-color: transparent;
+}
+
+.invert-toggle .fa-sync {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.invert-toggle.inverted {
+  color: var(--primary-color);
+}
+
+.invert-toggle.inverted .fa-sync {
+  transform: rotate(180deg);
+}
+
+.fa-eye,
+.fa-eye-slash {
+  width: 30px;
+}
+
+.delete-button {
+  color: var(--error-color);
+}
+
+.delete-button:hover {
+  color: var(--error-color-hover);
+}
+
+/* Ensure the visibility toggle and delete button remain clickable when greyed out */
+.clue-container.hidden .visibility-toggle,
+.clue-container.hidden .delete-button {
+  opacity: 1;
+  filter: none;
+}
+
+#add-control-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Popup Styles */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(50, 50, 50, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: opacity 0.1s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.popup-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.popup-content {
+  background: var(--background-color);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  color: var(--text-color);
+  position: relative;
+  padding-top: 60px;
+  width: 300px;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+}
+
+.popup-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.action-button {
+  background-color: var(--border-color);
+  color: var(--text-color-secondary);
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.action-button:hover {
+  background-color: var(--secondary-color);
+}
+
+.fullscreen-button {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.close-button {
+  width: 30px;
+  height: 30px;
+  background-color: var(--error-color);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background-color 0.3s ease;
+}
+
+.close-button:hover {
+  background-color: var(--error-color-hover);
+}
+
+.close-button::before,
+.close-button::after {
+  content: '';
+  position: absolute;
+  width: 15px;
+  height: 2px;
+  background-color: white;
+}
+
+.close-button::before {
+  transform: rotate(45deg);
+}
+
+.close-button::after {
+  transform: rotate(-45deg);
+}
+
+/* Form Styles */
+select,
+input[type='text'],
+input[type='number'],
+textarea {
+  width: 90%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* Map Controls */
+.leaflet-control-locateuser,
+.leaflet-control-toggle-darkmode {
+  background-color: var(--text-color);
+  color: var(--background-color);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+.leaflet-control-locateuser.locating {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+}
+
+/* Dark Mode for Map*/
+body.dark-mode .leaflet-layer {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+/* Tab Switcher */
+.tab-switcher {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  background-color: var(--surface-color);
+  border: none;
+  padding: 10px;
+  margin: 0 5px;
+  cursor: pointer;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.tab-button.active {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Suggestions */
+.suggestions-container {
+  position: relative;
+  width: 100%;
+}
+
+#clue-hints {
+  position: absolute;
+  width: 90%;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--text-color-secondary);
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+}
+
+#clue-hints li {
+  padding: 10px;
+  cursor: pointer;
+  background-color: var(--background-color);
+}
+
+#clue-hints li:hover {
+  background-color: var(--surface-color);
+}
+
+/* Notification Bar */
+.notification-bar {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  text-align: center;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease-in-out;
+  z-index: 1001;
+}
+
+.notification-bar.error {
+  background-color: var(--error-color);
+}
+
+.notification-bar.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Geocoder */
+.geocoder-control-input {
+  border-radius: 30px;
+}
+
+.geocoder-control-input,
+.geocoder-control-suggestions {
+  color: var(--surface-color);
+}
+
+.popup-body {
+  overflow-y: auto;
+  height: 400px;
+}
+
+#submit-clue {
+  margin-top: 10px;
+  width: 100%; /* Ensures the button spans the full width */
+  align-self: center; /* Centers the button horizontally */
+}
+
+/* HACK, it was shorter than the other inputs otherwise */
+#popup-clue-giver {
+  width: 108%;
+}
+#popup-direction {
+  width: 108%;
+}

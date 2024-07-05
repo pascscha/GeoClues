@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>GeoClues</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/esri-leaflet-geocoder/3.1.4/esri-leaflet-geocoder.min.css"
+        integrity="sha512-S9wQDYPfLO5aMoJo/0XXptyzTUg+dDwvxhrB5mGZL4MqyCA2ZuUgmmK5FvWZ+4LvwHHC/9preUA8LpisyTIxyQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"
+        integrity="sha512-gc3xjCmIy673V6MyOAZhIW93xhM9ei1I+gLbmFjUHIjocENRsLX/QUE1htk5q1XV2D/iie/VQ8DXI6Vu8bexvQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="css/locate.css" />
+    <link rel="stylesheet" href="css/main.css">
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/6.5.0/turf.min.js"
+        integrity="sha512-Q7HOppxoH0L2M7hreVoFCtUZimR2YaY0fBewIYzkCgmNtgOOZ5IgMNYxHgfps0qrO1ef5m7L1FeHrhXlq1I9HA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/esri-leaflet/3.0.12/esri-leaflet.min.js"
+        integrity="sha512-PqMtEWA1NRTJJS+yaMkHeaQC//Y5hTUfDODzBFhNRQ4RGHSa3RocdIlEInAYHgyDXSFb4tZAVKiXuoBbjx6fuQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/esri-leaflet-geocoder/3.1.4/esri-leaflet-geocoder.min.js"
+        integrity="sha512-DCqGglqItmUMybmlL6h8fnJH9O3Nhhiz3r/6INgvbDX7si1OSp++wnfh31y4sXsMeuluESqrZ8DytW2pLx46MQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/7.0.0/fuse.min.js"
+        integrity="sha512-GrJ4P9yra6dftp5O0eaKFKS4ch1FYn1xR/VCHQIMJO1LNqcKhjkAkAETHYoE81Ffh3BjCJMWA/AZSYP521jxFA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"
+        integrity="sha512-ozq8xQKq6urvuU6jNgkfqAmT7jKN2XumbrX1JiB3TnF7tI48DPI4Gy1GXKD/V3EExgAs1V+pRO7vwtS1LHg0Gw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="js/leaflet-simple-locate.min.js"></script>
+    <script src="js/main.js"></script>
+</head>
+
+<body>
+    <main>
+        <div id="notification-bar" class="notification-bar"></div>
+
+        <!-- Map section -->
+        <div id='map'></div>
+
+        <!-- Control panel container -->
+        <div id='control-panel-container'>
+
+            <!-- Control list container -->
+            <section id='control-list-container' style='overflow-y: auto; display:flex; flex-direction:column;'>
+                <ul id='control-list'>
+                    <li id="clue-container-template" class="clue-container" style="display: none;">
+                        <div class="clue-container">
+                            <div class="clue-header">
+                                <div class="clue-content">
+                                    <span id="clue-text-template" class="clue-text">Example Text</span>
+                                    <div id="clue-notes-template" class="clue-notes" contenteditable="true">Example
+                                        Notes</div>
+                                </div>
+                                <div class="clue-meta">
+                                    <span id="clue-timestamp-template" class="clue-timestamp">Example Timestamp</span>
+                                    <span id="clue-giver-template" class="clue-giver"
+                                        style="background-color: '#coffee'">Example Person</span>
+                                    <div class="clue-actions">
+                                        <button class="invert-toggle" aria-label="Invert clue">
+                                            <i class="fas fa-sync"></i>
+                                        </button>
+                                        <button class="visibility-toggle" aria-label="Toggle visibility">
+                                            <i class="fas fa-eye-slash"></i>
+                                        </button>
+                                        <button class="delete-button" aria-label="Delete clue">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <button id='add-control-btn'>+</button>
+        </div>
+    </main>
+
+    <div id="popup-overlay" class="popup-overlay">
+        <div class="popup-content">
+            <div class="popup-header">
+                <div class="popup-actions">
+                    <button id="import-button" class="action-button import-button" title="Import">
+                        <i class="fas fa-file-import"></i>
+                    </button>
+                    <button id="export-button" class="action-button export-button" title="Export">
+                        <i class="fas fa-file-export"></i>
+                    </button>
+                </div>
+                <button id="fullscreen-button" class="action-button fullscreen-button" title="Fullscreen">
+                    <i class="fas fa-expand"></i>
+                </button>
+                <button class="close-button" id="close-popup"></button>
+            </div>
+            <div class="popup-body"> <!-- New container for scrollable content -->
+                <div class="tab-switcher">
+                    <button class="tab-button active" data-tab="popup-radius">Radius</button>
+                    <button class="tab-button" data-tab="popup-direction">Direction</button>
+                    <button class="tab-button" data-tab="popup-region">Region</button>
+                    <button class="tab-button" data-tab="popup-drawing">Drawing</button>
+                </div>
+                <div id="popup-clue-giver" class="tab-content active">
+                    <label for="clue-giver">Clue Source</label>
+                    <select id="clue-giver">
+                        <option value="Carlo">Carlo</option>
+                        <option value="Yannick">Yannick</option>
+                        <option value="Mirco">Mirco</option>
+                        <option value="Pascal">Pascal</option>
+                    </select>
+                </div>
+                <div id="popup-radius" class="tab-content active">
+                    <label for="clue-radius">Radius (km)</label>
+                    <input type="number" id="clue-radius" placeholder="Radius in km">
+                </div>
+                <div id="popup-direction" class="tab-content">
+                    <label for="clue-direction">Direction</label>
+                    <select id="clue-direction">
+                        <option value="North">North</option>
+                        <option value="East">East</option>
+                        <option value="South">South</option>
+                        <option value="West">West</option>
+                    </select>
+                </div>
+                <div id="popup-place" class="tab-content active">
+                    <div class="suggestions-container">
+                        <label for="clue-place-input">Place or Coordinates</label>
+                        <input type="text" id="clue-place-input" placeholder="Place or Coordinates" />
+                    </div>
+                </div>
+                <div id="popup-region" class="tab-content">
+                    <label for="clue-region">Region</label>
+                    <input type="text" id="clue-region-input" placeholder="Region" />
+                </div>
+                <ul id="clue-hints"></ul>
+                <div id="popup-notes" class="tab-content active">
+                    <label for="clue-notes">Notes</label>
+                    <textarea id="clue-notes" placeholder="Enter any additional notes or information here"></textarea>
+                </div>
+            </div>
+            <button id="submit-clue">Add Clue</button>
+        </div>
+    </div>
+
+</body>
+
+</html>
