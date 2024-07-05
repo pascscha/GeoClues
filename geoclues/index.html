@@ -5,10 +5,12 @@
     <meta charset="UTF-8">
     <title>GeoClues</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+        integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/esri-leaflet-geocoder/3.1.4/esri-leaflet-geocoder.min.css"
         integrity="sha512-S9wQDYPfLO5aMoJo/0XXptyzTUg+dDwvxhrB5mGZL4MqyCA2ZuUgmmK5FvWZ+4LvwHHC/9preUA8LpisyTIxyQ=="
@@ -23,23 +25,28 @@
     <link rel="stylesheet" href="css/main.css">
 
     <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/6.5.0/turf.min.js"
-        integrity="sha512-Q7HOppxoH0L2M7hreVoFCtUZimR2YaY0fBewIYzkCgmNtgOOZ5IgMNYxHgfps0qrO1ef5m7L1FeHrhXlq1I9HA=="
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
+        integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/esri-leaflet/3.0.12/esri-leaflet.min.js"
-        integrity="sha512-PqMtEWA1NRTJJS+yaMkHeaQC//Y5hTUfDODzBFhNRQ4RGHSa3RocdIlEInAYHgyDXSFb4tZAVKiXuoBbjx6fuQ=="
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/7.0.0-alpha.111/turf.min.js"
+        integrity="sha512-CDnmZmmSy0ySPXxCD2R/3KRdjLjoAqfIN1Za4YTLflMrQ0NsnS7wcSRgYPVq9WLZNiC2MRvjcSZi9ZuwCoS/+A=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/esri-leaflet-geocoder/3.1.4/esri-leaflet-geocoder.min.js"
-        integrity="sha512-DCqGglqItmUMybmlL6h8fnJH9O3Nhhiz3r/6INgvbDX7si1OSp++wnfh31y4sXsMeuluESqrZ8DytW2pLx46MQ=="
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/esri-leaflet/3.0.12/esri-leaflet.js"
+        integrity="sha512-G4+fuKc1B96F0sUG7eKtgiJr0JM3iQC4bfc8WtYvmm7msHES0Hst2mLWASPb8zZk91tqMG86AjP0tgXIEFPPUA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/esri-leaflet-geocoder/2.3.4/esri-leaflet-geocoder.min.js"
+        integrity="sha512-EZtvNpqR5ZepLge7r9fxfWcTzaAOsoALVULE1+Eh38V5Ea3RQ10U0mSupzrbYMHaKyuU+YcVAn9Jh+PXs2U/FQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/7.0.0/fuse.min.js"
         integrity="sha512-GrJ4P9yra6dftp5O0eaKFKS4ch1FYn1xR/VCHQIMJO1LNqcKhjkAkAETHYoE81Ffh3BjCJMWA/AZSYP521jxFA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"
         integrity="sha512-ozq8xQKq6urvuU6jNgkfqAmT7jKN2XumbrX1JiB3TnF7tI48DPI4Gy1GXKD/V3EExgAs1V+pRO7vwtS1LHg0Gw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="js/leaflet-simple-locate.min.js"></script>
+    <script src="leaflet-simple-locate/dist/leaflet-simple-locate.min.js"></script>
     <script src="js/main.js"></script>
 </head>
 
@@ -116,10 +123,6 @@
                 <div id="popup-clue-giver" class="tab-content active">
                     <label for="clue-giver">Clue Source</label>
                     <select id="clue-giver">
-                        <option value="Carlo">Carlo</option>
-                        <option value="Yannick">Yannick</option>
-                        <option value="Mirco">Mirco</option>
-                        <option value="Pascal">Pascal</option>
                     </select>
                 </div>
                 <div id="popup-radius" class="tab-content active">

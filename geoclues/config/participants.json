@@ -1,0 +1,18 @@
+[
+    {
+        "name": "Alice",
+        "color": "#43b024"
+    },
+    {
+        "name": "Bob",
+        "color": "#248fb0"
+    },
+    {
+        "name": "Charlie",
+        "color": "#b0ae24"
+    },
+    {
+        "name": "Dora",
+        "color": "#e74c3c"
+    }
+]

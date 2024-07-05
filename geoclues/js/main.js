@@ -5,6 +5,7 @@ var contextMarker; // Marker for right-click / long-click context menu
 let region_fuse; // Fuse.js object for fuzzy searching regions
 let polygon_inventory; // Object containing region polygons
 let clueTemplate; // Template string for clue list, will be parsed from index.html
+var participants;
 
 // Map drawings
 var drawnItems = L.featureGroup()
@@ -16,9 +17,16 @@ var clue_polygons = {}
 // Maps path to json
 var polygon_json = {}
 
-FILE_VERSION = "2"
+// To ensure compatibility of imported files
+FILE_VERSION = "1.0"
 
+// To generate random names for the drawings
 const wordlist = ['Apple', 'Beach', 'Cloud', 'Dog', 'Eagle', 'Fire', 'Grass', 'Horse', 'Island', 'Jazz', 'Kite', 'Lemon', 'Moon', 'Nest', 'Ocean', 'Piano', 'Quilt', 'River', 'Sun', 'Tree', 'Umbrella', 'Violin', 'Whale', 'Xylophone', 'Yoga', 'Zebra', 'Air', 'Book', 'Candle', 'Desk', 'Elephant', 'Frog', 'Garden', 'Hat', 'Ice', 'Jacket', 'Key', 'Lamp', 'Mountain', 'Notebook', 'Orange', 'Pencil', 'Queen', 'Rain', 'Shoe', 'Table', 'Unicorn', 'Vase', 'Window', 'Box', 'Cat', 'Door', 'Egg', 'Flower', 'Globe', 'House', 'Igloo', 'Jar', 'King', 'Leaf', 'Mirror', 'Nail', 'Owl', 'Pillow', 'Quartz', 'Robot', 'Star', 'Tiger', 'Van', 'Water', 'Year', 'Zipper', 'Arrow', 'Balloon', 'Camera', 'Diamond', 'Earth', 'Feather', 'Guitar', 'Hammer', 'Ink', 'Jelly', 'Kangaroo', 'Lion', 'Magnet', 'Needle', 'Oasis', 'Paint', 'Quiet', 'Radio', 'Snake', 'Torch', 'Uniform', 'Volcano', 'Wagon', 'Yarn', 'Zest', 'Acorn', 'Bridge', 'Cactus']
+
+
+
+// Cahces pending promises, as not to load the same file multiple times
+const promiseCache = new Map();
 
 /**
  * Asynchronously loads JSON data from a file.
@@ -26,12 +34,19 @@ const wordlist = ['Apple', 'Beach', 'Cloud', 'Dog', 'Eagle', 'Fire', 'Grass', 'H
  * @returns {Promise<Object>} A promise that resolves with the parsed JSON data.
  */
 async function load_json(filename) {
-    const response = await fetch(filename);
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    } else {
-        return await response.json();
+    if (!promiseCache.has(filename)) {
+        const promise = fetch(filename)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            });
+
+        promiseCache.set(filename, promise);
     }
+
+    return promiseCache.get(filename);
 }
 
 function showNotification(message, error = false) {
@@ -52,7 +67,7 @@ function showNotification(message, error = false) {
 }
 
 // Load region data and initialize Fuse.js for region search
-load_json('json/inventory.json')
+load_json('config/inventory.json')
     .then(data => {
         polygon_inventory = data;
         const options = {
@@ -278,15 +293,16 @@ function initMap() {
     L.control.toggleDarkMode().addTo(map);
 
     // Add search control to the map
-    var searchControl = new L.esri.Controls.Geosearch().addTo(map);
-    var results = new L.LayerGroup().addTo(map);
+    var searchControl = new L.esri.Geocoding.geosearch().addTo(map);
+    const results = L.layerGroup().addTo(map);
 
-    searchControl.on('results', function (data) {
+    searchControl.on("results", function (data) {
         results.clearLayers();
-        for (var i = data.results.length - 1; i >= 0; i--) {
+        for (let i = data.results.length - 1; i >= 0; i--) {
             results.addLayer(L.marker(data.results[i].latlng));
         }
     });
+
 
     // Add the default streets layer to the map
     streets_layer.addTo(map);
@@ -378,7 +394,7 @@ function updateCluesPolygon() {
                         ? turf.union(turf.featureCollection(polygons))
                         : polygons[0];
 
-                    if (clue.inverted) {
+                    if (!clue.inverted) {
                         polygon = turf.difference(turf.featureCollection([everything, polygon]));
                     }
 
@@ -397,7 +413,7 @@ function updateCluesPolygon() {
 
             }
 
-            var color = getClueColor(clue["clueGiver"]);
+            var color = await getClueColor(clue["clueGiver"]);
             clue_polygons[clue["id"]] = L.geoJSON(polygon, {
                 color: color,
                 fillColor: getComputedStyle(document.body).getPropertyValue('--border-color'),
@@ -419,12 +435,12 @@ function updateCluesHTML() {
     controlList.innerHTML = "";
 
     let clueCounter = 0;
-    clues.forEach(function (clue) {
+    clues.forEach(async function (clue) {
         const listItem = document.createElement('li');
         listItem.className = 'clue-container';
 
         const text = getClueText(clue);
-        const color = getClueColor(clue.clueGiver);
+        const color = await getClueColor(clue.clueGiver);
 
         var date = new Date(clue.timestamp);
 
@@ -438,9 +454,17 @@ function updateCluesHTML() {
         }
 
         const clueTextElement = updateElement("clue-text", text);
-        updateElement("clue-notes", clue.notes);
+        const clueNotes = updateElement("clue-notes", clue.notes);
         updateElement("clue-timestamp", date.toISOString().slice(0, 16).replaceAll("T", " "));
         updateElement("clue-giver", clue.clueGiver);
+
+        clueNotes.addEventListener('input', function () {
+            // Update the notes in the clues object
+            clue.notes = this.textContent;
+
+            // Save the updated clues object to localStorage
+            localStorage.setItem('clues', JSON.stringify(clues));
+        });
 
         const clueGiverElement = listItem.querySelector(`#clue-giver-${clueCounter}`);
         if (clueGiverElement) {
@@ -578,23 +602,21 @@ function getClueText(clue) {
         const idx2 = Math.floor(n / wordlist.length) % wordlist.length;
 
         if (!clue.inverted) {
-            return `Outside of Drawing ${wordlist[idx1]}-${wordlist[idx2]}`;
+            return `Inside of Drawing ${wordlist[idx1]}-${wordlist[idx2]}`;
         }
         else {
-            return `Inside of Drawing ${wordlist[idx1]}-${wordlist[idx2]}`;
+            return `Outside of Drawing ${wordlist[idx1]}-${wordlist[idx2]}`;
         }
     }
     return "Unknown clue type";
 }
 
-function getClueColor(clueGiver) {
-    switch (clueGiver) {
-        case "Carlo": return "#43b024";
-        case "Yannick": return "#248fb0";
-        case "Mirco": return "#b0ae24"; // rgb(176, 174, 36)
-        case "Pascal": return "#e74c3c";
-        default: return "#95a5a6";
+async function getClueColor(clueGiver) {
+    if (!participants) {
+        participants = await load_json("config/participants.json")
     }
+    const participant = participants.find(p => p.name === clueGiver);
+    return participant ? participant.color : "#95a5a6";
 }
 
 function showPopup() {
@@ -670,9 +692,22 @@ function importData() {
     input.click();
 }
 
-function popup() {
+async function popup() {
     // Open Popup
     document.getElementById('add-control-btn').addEventListener('click', showPopup);
+
+    // Update clue giver
+    const clueGiverElement = document.getElementById("clue-giver")
+    if (!participants) {
+        participants = await load_json("config/participants.json")
+    }
+    participants.forEach(participant => {
+        const option = document.createElement('option');
+        option.value = participant.name;
+        option.textContent = participant.name;
+        clueGiverElement.appendChild(option);
+    });
+
 
     // Switch Popup Tabs
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -890,7 +925,6 @@ function popup() {
 
     // Cancel popup
     document.getElementById('close-popup').addEventListener('click', function () {
-        // TODO Clear inputs?
         hidePopup();
     });
 
